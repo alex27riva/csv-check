@@ -2,21 +2,34 @@ package main
 
 import (
 	"encoding/csv"
-    "log"
+	"fmt"
 	"os"
-    "io"
+	"io"
 )
 
 func main() {
-	r := csv.NewReader(os.Stdin)
+	if len(os.Args) != 2 {
+		fmt.Println("Usage: ", os.Args[0], "filename.csv")
+		return
+	}
 
+	filename := os.Args[1]
+	file, err := os.Open(filename)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	csvReader := csv.NewReader(file)
 	for {
-		_, err := r.Read()
+		_, err := csvReader.Read()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error reading CSV:", err)
+			return
 		}
 	}
 }
